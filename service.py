@@ -9,6 +9,7 @@ import bentoml
 SAMPLE_SENTENCE = "The sun dips below the horizon, painting the sky orange."
 
 MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
+BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 
 
 @bentoml.service(
@@ -18,11 +19,7 @@ MODEL_ID = "sentence-transformers/all-MiniLM-L6-v2"
 class SentenceTransformers:
 
     def __init__(self) -> None:
-        import torch
-        from sentence_transformers import SentenceTransformer, models
-
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = SentenceTransformer(MODEL_ID, device=self.device)
+        self.model = bentoml.models.get(BENTO_MODEL_TAG)
         print(f"Model '{MODEL_ID}' loaded on device: '{self.device}'.")
 
     @bentoml.api()
