@@ -18,8 +18,12 @@ BENTO_MODEL_TAG = MODEL_ID.lower().replace("/", "--")
 )
 class SentenceTransformers:
 
+    model = bentoml.models.get(BENTO_MODEL_TAG)
+
     def __init__(self) -> None:
-        self.model = bentoml.models.get(BENTO_MODEL_TAG)
+        from sentence_transformers import SentenceTransformer
+
+        self.st = SentenceTransformer(self.model.path, device="cpu")
         print(f"Model '{MODEL_ID}' loaded on device: '{self.device}'.")
 
     @bentoml.api()
@@ -30,6 +34,7 @@ class SentenceTransformers:
         print("data:", data)
         input_text = [item[1] for item in data]
         print("input_text:", input_text)
-        result = self.model.encode(input_text)
+
+        result = self.st.encode(input_text)
         data = {"data": [[index, value.tolist()] for index, value in enumerate(result)]}
         return data
